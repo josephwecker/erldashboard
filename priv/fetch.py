@@ -4,7 +4,6 @@ import imaplib, email
 curr_dir = os.path.dirname(__file__) + '/'
 sys.path.append(curr_dir)
 from erlport import Port, Protocol, Atom, String
-import pickle
 
 class Fetcher(Protocol):
     conn = None
@@ -19,7 +18,6 @@ class Fetcher(Protocol):
         self.username = String(username)
         self.password = String(password)
         self.mailbox = String(mailbox)
-        pickle.dump( (self.host, self.username, self.password, self.mailbox), open('dump.p', 'wb'))
         try:
             self.reconnect()
             return( Atom('ok') )
