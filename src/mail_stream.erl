@@ -15,13 +15,20 @@
 
 -define(SERVER, ?MODULE).
 
-start_link(Conn) ->
+start_link(FileName) when is_list(FileName) ->
+  {ok, Config} = file:consult(FileName),
+  lists:map(fun({C,B}) -> start_link(C,B) end, Config);
+start_link(Conn) when is_tuple(Conn) ->
   start_link(Conn, "Inbox").
 start_link(Conn, MBox) ->
   start_link(Conn, MBox, 5000).
+start_link(Conn, [H|_]=MBox, Freq) when is_list(H) ->
+  [start_link(Conn, MB, Freq) || MB <- MBox];
+start_link(Conn, [H|_]=MBox, Freq) when is_atom(H) ->
+  [start_link(Conn, atom_to_list(MB), Freq) || MB <- MBox];
 start_link(Conn, MBox, Freq) ->
   Self = self(),
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [Conn, MBox, Freq, Self], []).
+  gen_server:start_link(?MODULE, [Conn, MBox, Freq, Self], []).
 
 init([{Host, Username, Password}, MBox, Freq, Requestor]) ->
   Port = open_port({spawn, "fetch.py"}, [{packet, 4}, binary]),
