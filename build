@@ -1,2 +1,2 @@
 #!/bin/bash
-erlc -smp -W -o ./ebin/ ./src/email_srv.erl
+erlc -smp -W -o ./ebin/ ./src/mail_stream.erl
