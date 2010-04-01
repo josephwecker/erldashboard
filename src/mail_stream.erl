@@ -13,8 +13,6 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
     code_change/3]).
 
--define(SERVER, ?MODULE).
-
 start_link(FileName) when is_list(FileName) ->
   {ok, Config} = file:consult(FileName),
   lists:map(fun({C,B}) -> start_link(C,B) end, Config);
@@ -53,9 +51,10 @@ handle_info({Port, {data, Data}}, {Port, _, _} = State) ->
   port_response(binary_to_term(Data), State).
 
 port_response({email, Data, Msgs}, {_, Requestor, _} = State) ->
-  Data2 = [{K,proplists:get_all_values(K,Data)} ||
-    K <- proplists:get_keys(Data)],
-  Requestor ! {email, Data2, Msgs},
+  Data2 = [{string:to_lower(binary_to_list(K)), V} || {K,V} <- Data],
+  Data3 = [{K,proplists:get_all_values(K,Data2)} ||
+    K <- proplists:get_keys(Data2)],
+  Requestor ! {email, Data3, Msgs},
   {noreply, State};
 port_response(done_getting_new, {_, _, Freq} = State) ->
   timer:send_after(Freq, self(), check_mail),

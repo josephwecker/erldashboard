@@ -1,2 +1,3 @@
 #!/bin/bash
 erlc -smp -W -o ./ebin/ ./src/mail_stream.erl
+erlc -smp -W -o ./ebin/ ./src/email_analysis.erl
