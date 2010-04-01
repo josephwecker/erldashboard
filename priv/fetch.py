@@ -36,8 +36,7 @@ class Fetcher(Protocol):
             self.conn.logout()
 
     def handle_get_new(self):
-        if not self.conn:
-            self.reconnect()
+        self.reconnect()
         (r, m_ids) = self.conn.search('UTF-8', 'UNSEEN')
         if r == 'OK':
             self.port.write(Atom('initiating_get_new'))
