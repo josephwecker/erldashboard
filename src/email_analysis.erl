@@ -30,7 +30,8 @@ handle_info({email, HeadDat, Bodies}, AnalyzeCallback) ->
   spawn(fun() -> process_callback(HeadDat, Bodies, AnalyzeCallback) end),
   {noreply, AnalyzeCallback}.
 
-process_callback(HeadDat, Bodies, AnalyzeCallback) ->
+process_callback(HeadDat, InBodies, AnalyzeCallback) ->
+  Bodies = [{"body", InBodies}],
   case AnalyzeCallback(HeadDat, Bodies) of
     store ->
       store_email(HeadDat ++ Bodies);
@@ -47,9 +48,6 @@ store_email(Data) ->
     {"from", proplists:get_value("from",Data)}
   ],
   emongo:update(?MDB, "email", Check, Data, true).
-
-
-
 
 %% Unused callbacks
 handle_call(_Req, _Fr, State) ->
