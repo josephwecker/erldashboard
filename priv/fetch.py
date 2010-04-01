@@ -28,7 +28,7 @@ class Fetcher(Protocol):
         self.handle_logout()
         self.conn = imaplib.IMAP4_SSL(host=self.host)
         self.conn.login(self.username, self.password)
-        self.conn.select(self.mailbox, readonly=0)
+        self.conn.select('"'+self.mailbox+'"', readonly=0)
     
     def handle_logout(self):
         if self.conn:
@@ -46,7 +46,6 @@ class Fetcher(Protocol):
                 (r, msginfo) = self.conn.fetch(message, 'RFC822')
                 if r == 'OK':
                     msg = email.message_from_string(msginfo[0][1])
-                    #self.port.write( (Atom('email'), msg.items(), msg.get_payload()) )
                     if msg.is_multipart():
                         body = [a.as_string() for a in msg.get_payload()]
                     else:
