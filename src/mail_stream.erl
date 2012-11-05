@@ -19,7 +19,7 @@ start_link(FileName) when is_list(FileName) ->
 start_link(Conn) when is_tuple(Conn) ->
   start_link(Conn, "Inbox").
 start_link(Conn, MBox) ->
-  start_link(Conn, MBox, 5000).
+  start_link(Conn, MBox, 15000).
 start_link(Conn, [H|_]=MBox, Freq) when is_list(H) ->
   [start_link(Conn, MB, Freq) || MB <- MBox];
 start_link(Conn, [H|_]=MBox, Freq) when is_atom(H) ->
@@ -44,6 +44,7 @@ init([{Host, Username, Password}, MBox, Freq, Requestor]) ->
   end.
 
 handle_info(check_mail, {Port, _, _} = State) ->
+  io:format("[check]"),
   initiate_mail_check(Port),
   {noreply, State};
 
